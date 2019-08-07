@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Document Storage Service
+
+server:
+  port: 7300
+
+storage:
+  directory: "./docs"
