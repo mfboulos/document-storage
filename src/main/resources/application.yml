@@ -2,10 +2,10 @@ spring:
   application:
     name: Document Storage Service
   datasource:
-    url: jdbc:h2:file:${storage.directory}
+    url: jdbc:h2:file:${storage.directory}/meta
 
 server:
   port: 7300
 
 storage:
-  directory: "./docs"
+  directory: /docs
