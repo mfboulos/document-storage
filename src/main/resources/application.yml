@@ -1,6 +1,8 @@
 spring:
   application:
     name: Document Storage Service
+  datasource:
+    url: jdbc:h2:file:${storage.directory}
 
 server:
   port: 7300
