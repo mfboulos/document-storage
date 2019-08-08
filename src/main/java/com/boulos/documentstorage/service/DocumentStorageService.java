@@ -152,10 +152,10 @@ public class DocumentStorageService implements StorageService {
 	 * @return Randomly generated alphanumeric String of length 20
 	 */
 	public String generateId() {
-		String id = RandomStringUtils.randomAlphanumeric(20).toLowerCase();
+		String id = RandomStringUtils.randomAlphanumeric(20);
 		
 		while (repo.existsById(id)) {
-			id = RandomStringUtils.randomAlphanumeric(20).toLowerCase();
+			id = RandomStringUtils.randomAlphanumeric(20);
 		}
 		
 		return id;
