@@ -44,7 +44,7 @@ public class DocumentStorageServiceTest {
 	public void setUp() throws DocumentNotFoundException, IOException {
 		when(testRepo.findById(any())).thenReturn(Optional.empty());
 		when(testRepo.findById("25isfunnierthan24lol")).thenReturn(
-				Optional.of(new DocumentMetadata("25isfunnierthan24lol", 1000L, "jpg")));
+				Optional.of(new DocumentMetadata("25isfunnierthan24lol", "gnome", 1000L, "jpg")));
 		when(testFile.getOriginalFilename()).thenReturn("cool_dog.jpg");
 		
 		when(mockStream.read(any())).thenReturn(0);
@@ -70,7 +70,7 @@ public class DocumentStorageServiceTest {
 		when(testResource.getDescription()).thenReturn("Cool stuff");
 		doReturn(testResource).when(testDSS)
 				.loadFromPath(testPath.resolve("25isfunnierthan24lol.jpg"));
-		Resource result = testDSS.load("25isfunnierthan24lol");
+		Resource result = testDSS.load("25isfunnierthan24lol").getResource();
 		
 		assertEquals(testResource.getDescription(), result.getDescription());
 	}

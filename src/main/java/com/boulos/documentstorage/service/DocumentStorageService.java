@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.boulos.documentstorage.config.AppConfig;
 import com.boulos.documentstorage.database.DocumentRepository;
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
+import com.boulos.documentstorage.model.Document;
 import com.boulos.documentstorage.model.DocumentMetadata;
 
 import lombok.Setter;
@@ -42,7 +43,7 @@ public class DocumentStorageService implements StorageService {
 	}
 	
 	@Override
-	public Resource load(String docId) throws DocumentNotFoundException {
+	public Document load(String docId) throws DocumentNotFoundException {
 		// just in case people are trying to be funny here
 		String safeDocId = FilenameUtils.getBaseName(docId);
 		Optional<DocumentMetadata> optional = repo.findById(safeDocId);
@@ -54,20 +55,24 @@ public class DocumentStorageService implements StorageService {
 		
 		Path file = storageDirectory.resolve(safeDocId + "." + optional.get().getExtension());
 		Resource resource = loadFromPath(file);
-		return resource;
+		return new Document(optional.get(), resource);
 	}
 
 	@Override
 	public String store(MultipartFile file) {
 		String id = generateId();
+		String name = FilenameUtils
+				.getBaseName(file.getOriginalFilename());
 		String extension = FilenameUtils
 				.getExtension(file.getOriginalFilename())
 				.toLowerCase();
-		String newFile = id + "." + extension;
+		DocumentMetadata newMeta = new DocumentMetadata(id, name, 0L, extension);
 		
 		try (InputStream stream = file.getInputStream()) {
-			long bytes = copy(stream, this.storageDirectory.resolve(newFile));
-			repo.save(new DocumentMetadata(id, bytes, extension));
+			long bytes = copy(stream, this.storageDirectory
+					.resolve(newMeta.getStoredFileName()));
+			newMeta.setBytes(bytes);
+			repo.save(newMeta);
 		} catch (IOException e) {
 			// would suck if this happened
 			e.printStackTrace();
@@ -91,10 +96,10 @@ public class DocumentStorageService implements StorageService {
 		DocumentMetadata meta = optional.get();
 		
 		try (InputStream stream = file.getInputStream()) {
-			long bytes = copy(stream,
-					this.storageDirectory.resolve(meta.getId() + "." + meta.getExtension()),
-					StandardCopyOption.REPLACE_EXISTING);
-			meta.setBytes(bytes);
+			delete(this.storageDirectory.resolve(meta.getStoredFileName()));
+			meta.setName(FilenameUtils.getBaseName(file.getOriginalFilename()));
+			meta.setExtension(FilenameUtils.getExtension(file.getOriginalFilename()));
+			meta.setBytes(copy(stream, this.storageDirectory.resolve(meta.getStoredFileName())));
 			repo.save(meta);
 		} catch (IOException e) {
 			// would suck if this happened
@@ -117,8 +122,7 @@ public class DocumentStorageService implements StorageService {
 		DocumentMetadata meta = optional.get();
 		
 		try {
-			delete(this.storageDirectory.resolve(
-					meta.getId() + "." + meta.getExtension()));
+			delete(this.storageDirectory.resolve(meta.getStoredFileName()));
 			repo.deleteById(safeDocId);
 		} catch (IOException e) {
 			// you know the drill, this would be bad but don't really expect it

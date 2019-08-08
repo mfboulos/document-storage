@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
+import com.boulos.documentstorage.model.Document;
 import com.boulos.documentstorage.service.StorageService;
 
 import lombok.AllArgsConstructor;
@@ -34,19 +35,21 @@ public class DocumentController {
 	
 	@GetMapping("/{docId}")
 	public ResponseEntity<Resource> get(@PathVariable String docId, HttpServletRequest req) throws DocumentNotFoundException {
-		Resource file = storageService.load(docId);
+		Document file = storageService.load(docId);
 		MediaType contentType;
 		try {
 			contentType = MediaType.parseMediaType(
-					req.getServletContext().getMimeType(file.getFile().getAbsolutePath()));
+					req.getServletContext().getMimeType(
+							file.getResource().getFile().getAbsolutePath()));
 		} catch (IOException e) {
 			contentType = MediaType.APPLICATION_OCTET_STREAM;
 		}
 		
 		return ResponseEntity.ok()
 				.contentType(contentType)
-				.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getFilename()))
-				.body(file);
+				.header(HttpHeaders.CONTENT_DISPOSITION, String.format(
+						"attachment; filename=\"%s\"", file.getMeta().getOriginalFileName()))
+				.body(file.getResource());
 	}
 	
 	@PostMapping

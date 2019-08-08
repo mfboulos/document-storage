@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
+import com.boulos.documentstorage.model.Document;
 
 public interface StorageService {
 	/**
@@ -12,9 +13,9 @@ public interface StorageService {
 	 * returns it.
 	 * 
 	 * @param docId ID of the file
-	 * @return file as a Resource
+	 * @return file as a {@link Document}
 	 */
-	Resource load(String docId) throws DocumentNotFoundException;
+	Document load(String docId) throws DocumentNotFoundException;
 	
 	/**
 	 * Stores a file according to a {@link MultipartFile} payload.

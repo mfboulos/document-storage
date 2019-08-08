@@ -6,26 +6,34 @@ import javax.persistence.Id;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DocumentMetadata {
 	@Id
 	private String id;
+	private String name;
 	private Long bytes;
 	private String extension;
 	
-	public DocumentMetadata(String id, Long bytes, String extension) {
-		this.id = id;
-		this.bytes = bytes;
-		this.extension = extension;
+	public DocumentMetadata(String id, MultipartFile file) {
+		this(id, FilenameUtils.getBaseName(file.getOriginalFilename()),
+				file.getSize(),
+				FilenameUtils.getExtension(file.getOriginalFilename()));
 	}
 	
-	public DocumentMetadata(String id, MultipartFile file) {
-		this(id, file.getSize(),
-				FilenameUtils.getExtension(file.getOriginalFilename()));
+	public String getStoredFileName() {
+		return this.id + "." + this.extension;
+	}
+	
+	public String getOriginalFileName() {
+		return this.name + "." + this.extension;
 	}
 }
