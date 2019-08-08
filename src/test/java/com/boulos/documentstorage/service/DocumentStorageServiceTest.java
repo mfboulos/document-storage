@@ -47,12 +47,14 @@ public class DocumentStorageServiceTest {
 				Optional.of(new DocumentMetadata("25isfunnierthan24lol", 1000L, "jpg")));
 		when(testFile.getOriginalFilename()).thenReturn("cool_dog.jpg");
 		
-		mockStream = mock(InputStream.class);
 		when(mockStream.read(any())).thenReturn(0);
 		when(testFile.getInputStream()).thenReturn(mockStream);
 		
 		testDSS.setRepo(testRepo);
 		testDSS.setStorageDirectory(testPath);
+		
+		doReturn(0L).when(testDSS).copy(eq(mockStream), any(), any());
+		doNothing().when(testDSS).delete(any(Path.class));
 	}
 	
 	@Test(expected=DocumentNotFoundException.class)
@@ -77,7 +79,7 @@ public class DocumentStorageServiceTest {
 	public void testDocumentIsStoredFromMultipartForm() throws IOException {
 		testDSS.store(testFile);
 		verify(testRepo).save(any());
-		verify(mockStream).read(any());
+		verify(testDSS).copy(eq(mockStream), any(), any());
 	}
 
 	@Test(expected=DocumentNotFoundException.class)
@@ -86,10 +88,10 @@ public class DocumentStorageServiceTest {
 	}
 
 	@Test
-	public void testUpdateOverwritesDocumentWithValidDocId() throws IOException {
+	public void testUpdateOverwritesDocumentWithValidDocId() throws IOException, DocumentNotFoundException {
 		testDSS.update("25isfunnierthan24lol", testFile);
 		verify(testRepo).save(any());
-		verify(mockStream).read(any());
+		verify(testDSS).copy(eq(mockStream), any(), any());
 	}
 	
 	@Test(expected=DocumentNotFoundException.class)
@@ -100,8 +102,8 @@ public class DocumentStorageServiceTest {
 	@Test
 	public void testDocumentIsDeletedIfGivenValidDocId() throws DocumentNotFoundException {
 		testDSS.delete("25isfunnierthan24lol");
-		verify(testRepo).delete(any());
-		// verify file is deleted
+		verify(testRepo).deleteById("25isfunnierthan24lol");
+		verify(testDSS).delete("25isfunnierthan24lol");
 	}
 	
 	@Test

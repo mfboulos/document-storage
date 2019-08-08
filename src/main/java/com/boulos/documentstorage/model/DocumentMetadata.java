@@ -3,7 +3,8 @@ package com.boulos.documentstorage.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,15 +14,18 @@ import lombok.Setter;
 @Setter
 public class DocumentMetadata {
 	@Id
-	@GenericGenerator(
-			name="doc-id-generator",
-			strategy="com.boulos.documentstorage.database.DocumentIdGenerator")
 	private String id;
 	private Long bytes;
 	private String extension;
 	
-	public DocumentMetadata(Long bytes, String extension) {
+	public DocumentMetadata(String id, Long bytes, String extension) {
+		this.id = id;
 		this.bytes = bytes;
 		this.extension = extension;
+	}
+	
+	public DocumentMetadata(String id, MultipartFile file) {
+		this(id, file.getSize(),
+				FilenameUtils.getExtension(file.getOriginalFilename()));
 	}
 }

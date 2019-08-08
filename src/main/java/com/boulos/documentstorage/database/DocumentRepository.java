@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.boulos.documentstorage.model.DocumentMetadata;;
 
-public interface DocumentRepository extends CrudRepository<DocumentMetadata, Long>{
+public interface DocumentRepository extends CrudRepository<DocumentMetadata, String>{
 
 }

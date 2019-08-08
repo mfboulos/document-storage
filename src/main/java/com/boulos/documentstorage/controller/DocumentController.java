@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.boulos.documentstorage.exception.DocumentNotFoundException;
 import com.boulos.documentstorage.service.StorageService;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class DocumentController {
 	private final StorageService storageService;
 	
 	@GetMapping("/{docId}")
-	public ResponseEntity<Resource> get(@PathVariable String docId) {
+	public ResponseEntity<Resource> get(@PathVariable String docId) throws DocumentNotFoundException {
 		Resource file = storageService.load(docId);
 		return new ResponseEntity<>(file, HttpStatus.OK);
 	}
@@ -36,13 +37,13 @@ public class DocumentController {
 	}
 	
 	@PutMapping("/{docId}")
-	public ResponseEntity<?> update(@PathVariable String docId, @RequestParam MultipartFile file) {
+	public ResponseEntity<?> update(@PathVariable String docId, @RequestParam MultipartFile file) throws DocumentNotFoundException {
 		storageService.update(docId, file);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
 	@PutMapping("/{docId}")
-	public ResponseEntity<?> delete(@PathVariable String docId) {
+	public ResponseEntity<?> delete(@PathVariable String docId) throws DocumentNotFoundException {
 		storageService.delete(docId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
