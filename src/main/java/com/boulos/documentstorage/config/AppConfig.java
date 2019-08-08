@@ -7,7 +7,6 @@ import org.springframework.context.annotation.PropertySource;
 import lombok.Getter;
 import lombok.Setter;
 
-@Configuration
 @PropertySource("classpath:application.yml")
 @ConfigurationProperties(prefix="storage")
 @Getter

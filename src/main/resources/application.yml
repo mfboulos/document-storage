@@ -2,10 +2,13 @@ spring:
   application:
     name: Document Storage Service
   datasource:
-    url: jdbc:h2:file:${storage.directory}/meta
+    url: jdbc:h2:file:${storage.directory}/metadata
+    username: sa
+    password: sa
+    driverClassName: org.h2.Driver
 
 server:
   port: 7300
 
 storage:
-  directory: /docs
+  directory: ./docs
