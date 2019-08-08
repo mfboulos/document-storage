@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,7 @@ public class DocumentController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
-	@PutMapping("/{docId}")
+	@DeleteMapping("/{docId}")
 	public ResponseEntity<?> delete(@PathVariable String docId) throws DocumentNotFoundException {
 		storageService.delete(docId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
