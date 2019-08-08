@@ -6,6 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Document containing {@link DocumentMetadata} and {@link Resource} information.
+ * 
+ * @author Boulos
+ *
+ */
 @Getter
 @Setter
 @AllArgsConstructor

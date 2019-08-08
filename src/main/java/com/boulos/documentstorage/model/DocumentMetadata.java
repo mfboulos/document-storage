@@ -11,6 +11,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Persistent metadata for saved documents.
+ * 
+ * @author Boulos
+ *
+ */
 @Entity
 @Getter
 @Setter

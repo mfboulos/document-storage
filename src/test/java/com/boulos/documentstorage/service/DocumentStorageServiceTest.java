@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.boulos.documentstorage.config.AppConfig;
+import com.boulos.documentstorage.config.StorageConfig;
 import com.boulos.documentstorage.database.DocumentRepository;
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
 import com.boulos.documentstorage.model.DocumentMetadata;
@@ -29,7 +29,7 @@ public class DocumentStorageServiceTest {
 	@Mock
 	private DocumentRepository testRepo;
 	@Mock
-	private AppConfig appConfig;
+	private StorageConfig appConfig;
 	@Mock
 	private MultipartFile testFile;
 	@Mock
@@ -41,6 +41,7 @@ public class DocumentStorageServiceTest {
 	
 	@Before
 	public void setUp() throws DocumentNotFoundException, IOException {
+		// our metadata repo should be mocked to have one record
 		when(testRepo.findById(any())).thenReturn(Optional.empty());
 		when(testRepo.findById("25isfunnierthan24lol")).thenReturn(
 				Optional.of(new DocumentMetadata("25isfunnierthan24lol", "gnome", 1000L, "jpg")));
@@ -69,14 +70,15 @@ public class DocumentStorageServiceTest {
 		when(testResource.getDescription()).thenReturn("Cool stuff");
 		doReturn(testResource).when(testDSS)
 				.loadFromPath(testPath.resolve("25isfunnierthan24lol.jpg"));
-		Resource result = testDSS.load("25isfunnierthan24lol").getResource();
 		
+		Resource result = testDSS.load("25isfunnierthan24lol").getResource();
 		assertEquals(testResource.getDescription(), result.getDescription());
 	}
 
 	@Test
 	public void testDocumentIsStoredFromMultipartForm() throws IOException {
 		testDSS.store(testFile);
+		
 		verify(testRepo).save(any());
 		verify(testDSS).copy(eq(mockStream), any(), any());
 	}
@@ -89,7 +91,9 @@ public class DocumentStorageServiceTest {
 	@Test
 	public void testUpdateOverwritesDocumentWithValidDocId() throws IOException, DocumentNotFoundException {
 		testDSS.update("25isfunnierthan24lol", testFile);
+		
 		verify(testRepo).save(any());
+		verify(testDSS).delete(any(Path.class));
 		verify(testDSS).copy(eq(mockStream), any(), any());
 	}
 	
@@ -101,12 +105,15 @@ public class DocumentStorageServiceTest {
 	@Test
 	public void testDocumentIsDeletedIfGivenValidDocId() throws DocumentNotFoundException {
 		testDSS.delete("25isfunnierthan24lol");
+		
 		verify(testRepo).deleteById("25isfunnierthan24lol");
 		verify(testDSS).delete("25isfunnierthan24lol");
 	}
 	
 	@Test
 	public void testGeneratedIdsAreValid() {
+		when(testRepo.existsById(any())).thenReturn(false);
+		
 		String id = testDSS.generateId();
 		assertEquals(20, id.length());
 		assertTrue(StringUtils.isAlphanumeric(id));

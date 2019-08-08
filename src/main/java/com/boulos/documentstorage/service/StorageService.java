@@ -6,10 +6,16 @@ import org.springframework.web.multipart.MultipartFile;
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
 import com.boulos.documentstorage.model.Document;
 
+/**
+ * Interface for storage by id through an HTTP web service.
+ * 
+ * @author Boulos
+ * @see DocumentStorageService
+ */
 public interface StorageService {
 	/**
 	 * Loads file as a {@link Resource} from the given {@code docId} and
-	 * returns it.
+	 * returns it in a {@link Document}.
 	 * 
 	 * @param docId ID of the file
 	 * @return file as a {@link Document}

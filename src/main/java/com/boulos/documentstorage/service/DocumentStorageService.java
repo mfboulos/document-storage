@@ -17,7 +17,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.boulos.documentstorage.config.AppConfig;
+import com.boulos.documentstorage.config.StorageConfig;
 import com.boulos.documentstorage.database.DocumentRepository;
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
 import com.boulos.documentstorage.model.Document;
@@ -25,16 +25,24 @@ import com.boulos.documentstorage.model.DocumentMetadata;
 
 import lombok.Setter;
 
+/**
+ * Implementation of {@link StorageService} which autowires a configured storage
+ * directory and metadata repository for document storage.
+ * 
+ * @author Boulos
+ *
+ */
 @Component
 @Setter
 public class DocumentStorageService implements StorageService {
 	private DocumentRepository repo;
 	private Path storageDirectory;
 	
-	public DocumentStorageService() {}
+	// just for unit testing :)
+	DocumentStorageService() {}
 	
 	@Autowired
-	public DocumentStorageService(AppConfig config, DocumentRepository repo) {
+	public DocumentStorageService(StorageConfig config, DocumentRepository repo) {
 		this.storageDirectory = Paths.get(config.getDirectory());
 		this.repo = repo;
 	}
@@ -50,9 +58,12 @@ public class DocumentStorageService implements StorageService {
 			throw new DocumentNotFoundException();
 		}
 		
-		Path file = storageDirectory.resolve(safeDocId + "." + optional.get().getExtension());
+		DocumentMetadata meta = optional.get();
+		
+		// get our file as stored, and return it with its metadata
+		Path file = storageDirectory.resolve(meta.getStoredFileName());
 		Resource resource = loadFromPath(file);
-		return new Document(optional.get(), resource);
+		return new Document(meta, resource);
 	}
 
 	@Override
@@ -63,9 +74,13 @@ public class DocumentStorageService implements StorageService {
 		String extension = FilenameUtils
 				.getExtension(file.getOriginalFilename())
 				.toLowerCase();
+		
+		// create metadata for our new file, we'll set bytes later
 		DocumentMetadata newMeta = new DocumentMetadata(id, name, 0L, extension);
 		
 		try (InputStream stream = file.getInputStream()) {
+			// save the file as {id}.{extension}, so we're guaranteed
+			// uniqueness among saved files
 			long bytes = copy(stream, this.storageDirectory
 					.resolve(newMeta.getStoredFileName()));
 			newMeta.setBytes(bytes);
@@ -93,7 +108,11 @@ public class DocumentStorageService implements StorageService {
 		DocumentMetadata meta = optional.get();
 		
 		try (InputStream stream = file.getInputStream()) {
+			// since the extension can be different, the filename might be too
+			// so we're deleting and recreating the file instead of overwriting it
 			delete(this.storageDirectory.resolve(meta.getStoredFileName()));
+			
+			// also need to update metadata
 			meta.setName(FilenameUtils.getBaseName(file.getOriginalFilename()));
 			meta.setExtension(FilenameUtils.getExtension(file.getOriginalFilename()));
 			meta.setBytes(copy(stream, this.storageDirectory.resolve(meta.getStoredFileName())));

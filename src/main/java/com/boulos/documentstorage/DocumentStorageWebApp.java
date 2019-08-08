@@ -6,10 +6,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-import com.boulos.documentstorage.config.AppConfig;
+import com.boulos.documentstorage.config.StorageConfig;
 
 @SpringBootApplication
-@EnableConfigurationProperties(AppConfig.class)
+@EnableConfigurationProperties(StorageConfig.class)
 public class DocumentStorageWebApp extends SpringBootServletInitializer {
 	
 	public static void main(String[] args) {

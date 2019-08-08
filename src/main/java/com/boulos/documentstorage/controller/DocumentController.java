@@ -33,6 +33,15 @@ import lombok.AllArgsConstructor;
 public class DocumentController {
 	private final StorageService storageService;
 	
+	/**
+	 * Handles {@code HTTP GET} by invoking the {@link StorageService} to load
+	 * the resource identified by {@code docId}.
+	 * 
+	 * @param docId Id represented in the URL path
+	 * @param req Servlet request to extract context for MIME type
+	 * @return Resource as a file attachment
+	 * @throws DocumentNotFoundException if {@code docId} is invalid
+	 */
 	@GetMapping("/{docId}")
 	public ResponseEntity<Resource> get(@PathVariable String docId, HttpServletRequest req) throws DocumentNotFoundException {
 		Document file = storageService.load(docId);
@@ -52,20 +61,47 @@ public class DocumentController {
 				.body(file.getResource());
 	}
 	
+	/**
+	 * Handles {@code HTTP POST} by invoking the {@link StorageService} to
+	 * store the file in the request payload.
+	 * 
+	 * @param file File sent through the HTTP request
+	 * @return docId of the saved document
+	 */
 	@PostMapping
 	public ResponseEntity<String> create(@RequestParam MultipartFile file) {
 		String docId = storageService.store(file);
 		return new ResponseEntity<>(docId, HttpStatus.CREATED);
 	}
 	
+	/**
+	 * Handles {@code HTTP PUT} by invoking the {@link StorageService} to
+	 * update the file in the request payload identified by {@link docId}.
+	 * 
+	 * @param docId Id of the file to update
+	 * @param file File to update to
+	 * @return Response with no content
+	 * @throws DocumentNotFoundException if {@code docId} is invalid
+	 */
 	@PutMapping("/{docId}")
-	public ResponseEntity<?> update(@PathVariable String docId, @RequestParam MultipartFile file) throws DocumentNotFoundException {
+	public ResponseEntity<?> update(
+			@PathVariable String docId,
+			@RequestParam MultipartFile file) throws DocumentNotFoundException {
 		storageService.update(docId, file);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
+	/**
+	 * Handles {@code HTTP DELETE} by invoking the {@link StorageService} to
+	 * delete the file identified by {@link docId}.
+	 * 
+	 * @param docId Id of the file to delete
+	 * @return Response with no content
+	 * @throws DocumentNotFoundException if {@code docId} is invalid
+	 */
 	@DeleteMapping("/{docId}")
-	public ResponseEntity<?> delete(@PathVariable String docId) throws DocumentNotFoundException {
+	public ResponseEntity<?> delete(
+			@PathVariable String docId) throws DocumentNotFoundException {
 		storageService.delete(docId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
