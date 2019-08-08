@@ -1,7 +1,10 @@
 package com.boulos.documentstorage.service;
 
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.boulos.documentstorage.exception.DocumentNotFoundException;
 
 public interface StorageService {
 	/**
@@ -11,7 +14,7 @@ public interface StorageService {
 	 * @param docId ID of the file
 	 * @return file as a Resource
 	 */
-	Resource load(String docId);
+	Resource load(String docId) throws DocumentNotFoundException;
 	
 	/**
 	 * Stores a file according to a {@link MultipartFile} payload.
@@ -28,12 +31,12 @@ public interface StorageService {
 	 * @param docId ID of the file
 	 * @param file Payload containing contents to overwrite with
 	 */
-	void update(String docId, MultipartFile file);
+	void update(String docId, MultipartFile file) throws DocumentNotFoundException;
 	
 	/**
 	 * Deletes the file referenced by {@code docId}.
 	 * 
 	 * @param docId ID of the file
 	 */
-	void delete(String docId);
+	void delete(String docId) throws DocumentNotFoundException;
 }
