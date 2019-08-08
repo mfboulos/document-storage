@@ -1,7 +1,14 @@
 package com.boulos.documentstorage.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,9 +33,20 @@ public class DocumentController {
 	private final StorageService storageService;
 	
 	@GetMapping("/{docId}")
-	public ResponseEntity<Resource> get(@PathVariable String docId) throws DocumentNotFoundException {
+	public ResponseEntity<Resource> get(@PathVariable String docId, HttpServletRequest req) throws DocumentNotFoundException {
 		Resource file = storageService.load(docId);
-		return new ResponseEntity<>(file, HttpStatus.OK);
+		MediaType contentType;
+		try {
+			contentType = MediaType.parseMediaType(
+					req.getServletContext().getMimeType(file.getFile().getAbsolutePath()));
+		} catch (IOException e) {
+			contentType = MediaType.APPLICATION_OCTET_STREAM;
+		}
+		
+		return ResponseEntity.ok()
+				.contentType(contentType)
+				.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getFilename()))
+				.body(file);
 	}
 	
 	@PostMapping
