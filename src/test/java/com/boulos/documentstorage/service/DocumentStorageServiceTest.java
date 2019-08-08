@@ -1,7 +1,6 @@
 package com.boulos.documentstorage.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.h2.engine.Database;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

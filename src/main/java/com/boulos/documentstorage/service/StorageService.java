@@ -1,7 +1,6 @@
 package com.boulos.documentstorage.service;
 
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.boulos.documentstorage.exception.DocumentNotFoundException;
