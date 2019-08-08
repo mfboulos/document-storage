@@ -37,7 +37,7 @@ public class DocumentController {
 	
 	@PutMapping("/{docId}")
 	public ResponseEntity<?> update(@PathVariable String docId, @RequestParam MultipartFile file) {
-		storageService.update(file);
+		storageService.update(docId, file);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	

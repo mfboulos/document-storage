@@ -4,8 +4,36 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StorageService {
-	Resource load(String fileName);
+	/**
+	 * Loads file as a {@link Resource} from the given {@code docId} and
+	 * returns it.
+	 * 
+	 * @param docId ID of the file
+	 * @return file as a Resource
+	 */
+	Resource load(String docId);
+	
+	/**
+	 * Stores a file according to a {@link MultipartFile} payload.
+	 * 
+	 * @param file Payload containing file contents
+	 * @return Randomly generated ID as a String
+	 */
 	String store(MultipartFile file);
-	void update(MultipartFile file);
-	void delete(String fileName);
+	
+	/**
+	 * Updates the file referenced by {@code docId} according to a
+	 * {@link MultipartFile} payload.
+	 * 
+	 * @param docId ID of the file
+	 * @param file Payload containing contents to overwrite with
+	 */
+	void update(String docId, MultipartFile file);
+	
+	/**
+	 * Deletes the file referenced by {@code docId}.
+	 * 
+	 * @param docId ID of the file
+	 */
+	void delete(String docId);
 }
